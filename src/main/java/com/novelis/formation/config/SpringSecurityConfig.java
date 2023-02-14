@@ -6,8 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@ComponentScan(basePackages = "com.novelis.formation.security")
 @EnableWebSecurity
 public class SpringSecurityConfig {
 
@@ -24,15 +25,15 @@ public class SpringSecurityConfig {
     UserDetailsService userDetailsService;
 
     @Bean
-    public PasswordEncoder encoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public DaoAuthenticationProvider authProvider() {
+    public AuthenticationProvider authProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(encoder());
+        authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
 
@@ -46,9 +47,14 @@ public class SpringSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
+                .cors().and().csrf().disable()
+                .httpBasic()
+                .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/*")
+                .requestMatchers("/users/login", "/users")
                 .permitAll()
+                .requestMatchers("/*")
+                .authenticated()
                 .and()
                 .build();
     }

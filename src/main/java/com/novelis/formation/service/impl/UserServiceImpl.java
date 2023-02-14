@@ -8,6 +8,11 @@ import com.novelis.formation.service.exception.DataAlreadyExistsException;
 import com.novelis.formation.service.exception.DataNotFoundException;
 import com.novelis.formation.service.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +24,10 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @Override
     public UserDto findUserById(Long id) throws DataNotFoundException {
@@ -40,6 +49,7 @@ public class UserServiceImpl implements UserService {
             throw new DataAlreadyExistsException("Username " + userDto.getUsername() + " already exists");
         }
         User user = userMapper.toEntity(userDto);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userMapper
                 .toDto(userRepository.save(user));
     }
@@ -66,9 +76,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto loginUser(UserDto userDto) throws DataNotFoundException {
-        User user = userRepository
-                .findUserByUsernameAndPassword(userDto.getUsername(), userDto.getPassword())
-                .orElseThrow(() -> new DataNotFoundException("User not found"));
-        return userMapper.toDto(user);
+        Authentication authentication = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return null;
     }
 }

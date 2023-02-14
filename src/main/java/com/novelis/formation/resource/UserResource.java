@@ -7,6 +7,8 @@ import com.novelis.formation.service.exception.DataAlreadyExistsException;
 import com.novelis.formation.service.exception.DataNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +30,9 @@ public class UserResource {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserDto> loginUser(@RequestBody UserDto userDto) throws DataNotFoundException {
-        return ResponseEntity.ok(userService.loginUser(userDto));
+    public ResponseEntity<Authentication> loginUser(@RequestBody UserDto userDto) throws DataNotFoundException {
+        userService.loginUser(userDto);
+        return ResponseEntity.ok(SecurityContextHolder.getContext().getAuthentication());
     }
 
     @PostMapping
