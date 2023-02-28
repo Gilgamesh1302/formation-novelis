@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.bind.annotation.Mapping;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -17,5 +19,6 @@ public class ArticleDto {
     private String title;
     private String content;
     private String author;
+    private LocalDateTime createdAt;
     private List<CommentDto> comments;
 }

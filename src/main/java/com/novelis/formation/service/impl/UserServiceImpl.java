@@ -2,6 +2,7 @@ package com.novelis.formation.service.impl;
 
 import com.novelis.formation.domain.User;
 import com.novelis.formation.repository.UserRepository;
+import com.novelis.formation.security.UserDetailsServiceImpl;
 import com.novelis.formation.service.UserService;
 import com.novelis.formation.service.dto.UserDto;
 import com.novelis.formation.service.exception.DataAlreadyExistsException;
@@ -11,11 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -75,10 +80,37 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto loginUser(UserDto userDto) throws DataNotFoundException {
+    public String loginUser(UserDto userDto) throws DataNotFoundException {
+        userRepository
+                .findUserByUsername(userDto.getUsername())
+                .orElseThrow(() -> new DataNotFoundException("no user found with username " + userDto.getUsername()));
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_USER");
+        Set<GrantedAuthority> authoritySet = new HashSet<>();
+        authoritySet.add(authority);
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword()));
+                .authenticate(new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword(), authoritySet));
+        String stringToEncode = userDto.getUsername() + ":" + userDto.getPassword();
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString(stringToEncode.getBytes());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return null;
+        return authHeader;
+    }
+
+    @Override
+    public UserDto getUserInformation(UserDto userDto) throws DataNotFoundException {
+        User user = userRepository
+                .findUserByUsernameAndPassword(userDto.getUsername(), userDto.getPassword())
+                .orElseThrow(() -> new DataNotFoundException("no user found"));
+        return userMapper.toDto(user);
+    }
+
+    @Override
+    public UserDto getAuthenticatedUser(String username) throws DataNotFoundException {
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+        User user = userRepository
+                .findUserByUsername(authentication.getName())
+                .orElseThrow(() -> new DataNotFoundException("no user found"));
+        return userMapper.toDto(user);
     }
 }

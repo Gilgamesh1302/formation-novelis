@@ -9,6 +9,7 @@ import com.novelis.formation.service.dto.CommentDto;
 import com.novelis.formation.service.exception.DataNotFoundException;
 import com.novelis.formation.service.mapper.CommentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -77,7 +78,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentDto> findCommentsByArticleId(long articleId) {
-        List<Comment> articleComments = commentRepository.findCommentsByArticleId(articleId);
+        Sort sort = Sort.by("publishingDate").descending();
+        List<Comment> articleComments = commentRepository.findCommentsByArticleId(articleId, sort);
         return commentMapper.toDtoList(articleComments);
     }
 }

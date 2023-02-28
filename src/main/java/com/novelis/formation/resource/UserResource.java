@@ -8,12 +8,15 @@ import com.novelis.formation.service.exception.DataNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/users")
 public class UserResource {
     @Autowired
@@ -24,15 +27,19 @@ public class UserResource {
         return ResponseEntity.ok(userService.findUserById(id));
     }
 
+    @GetMapping("/authenticated")
+    public UserDto getAuthenticatedUser() throws DataNotFoundException {
+        return userService.getAuthenticatedUser("");
+    }
+
     @GetMapping
     public ResponseEntity<List<UserDto>> getAll() {
         return ResponseEntity.ok(userService.findAllUsers());
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Authentication> loginUser(@RequestBody UserDto userDto) throws DataNotFoundException {
-        userService.loginUser(userDto);
-        return ResponseEntity.ok(SecurityContextHolder.getContext().getAuthentication());
+    public ResponseEntity<String> loginUser(@RequestBody UserDto userDto) throws DataNotFoundException {
+        return ResponseEntity.ok(userService.loginUser(userDto));
     }
 
     @PostMapping

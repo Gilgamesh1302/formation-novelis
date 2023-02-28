@@ -3,6 +3,7 @@ package com.novelis.formation.resource;
 
 import com.novelis.formation.service.ArticleService;
 import com.novelis.formation.service.dto.ArticleDto;
+import com.novelis.formation.service.dto.FilterDto;
 import com.novelis.formation.service.exception.BadRequestException;
 import com.novelis.formation.service.exception.DataNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/articles")
 public class ArticleResource {
 
@@ -51,6 +53,11 @@ public class ArticleResource {
                         .ok(articleService.findAllArticleByPage(page, size))
                 );
         return responseEntity;
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<Page<ArticleDto>> filterArticle(@RequestBody FilterDto filter) {
+        return ResponseEntity.ok(articleService.filterArticle(filter));
     }
 
     @PostMapping

@@ -6,6 +6,7 @@ import com.novelis.formation.repository.CommentRepository;
 import com.novelis.formation.service.ArticleService;
 import com.novelis.formation.service.dto.ArticleDto;
 import com.novelis.formation.service.dto.CommentDto;
+import com.novelis.formation.service.dto.FilterDto;
 import com.novelis.formation.service.exception.DataNotFoundException;
 import com.novelis.formation.service.mapper.ArticleMapper;
 import com.novelis.formation.service.mapper.CommentMapper;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -85,13 +87,37 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticleDto getArticleWithComments(Long id) throws DataNotFoundException {
+        Sort sort = Sort.by("publishingDate").descending();
         ArticleDto articleDto = findArticleById(id);
         List<CommentDto> comments = commentRepository
-                .findCommentsByArticleId(id)
+                .findCommentsByArticleId(id, sort)
                 .stream()
                 .map(commentMapper::toDto)
                 .toList();
         articleDto.setComments(comments);
         return articleDto;
+    }
+
+    @Override
+    public Page<ArticleDto> filterArticle(FilterDto filterDto) {
+        Pageable page = PageRequest.of(0, 10);
+        if (filterDto.getSortBy() != null) {
+            Sort sort = Sort.by(filterDto.getSortBy());
+            if (filterDto.isDesc()) {
+                sort = sort.descending();
+            }
+            page = PageRequest.of(0, 10, sort);
+        }
+        Page<Article> result = articleRepository.findAll(page);
+        if (filterDto.getFilterBy() != null) {
+            if ("author".equals(filterDto.getFilterBy())) {
+                result = articleRepository
+                        .findArticlesByAuthorIgnoreCase(filterDto.getAuthorName(), page);
+            } else if ("createdAt".equals(filterDto.getFilterBy())) {
+                result = articleRepository
+                        .findArticlesByCreatedAtBetween(filterDto.getBeginDate(), filterDto.getEndDate(), page);
+            }
+        }
+        return result.map(articleMapper::toDto);
     }
 }
