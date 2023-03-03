@@ -1,10 +1,11 @@
-const formatDate = (dateString) => {
+const defaultOptions = {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+}
+
+const formatDate = (dateString, options = defaultOptions) => {
     const date = new Date(dateString);
-    const options = {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric"
-    }
     return date.toLocaleDateString("en-GB", options);
 };
 

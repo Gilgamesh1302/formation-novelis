@@ -1,5 +1,5 @@
 import React from "react";
-import Loading from "../Loading";
+import Loading from "@component/Loading";
 
 const PreFetch = ({ isLoading, isError, error, children }) => {
     if (isLoading) {

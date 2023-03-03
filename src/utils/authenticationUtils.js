@@ -1,14 +1,6 @@
 import { useGetUser } from "@/api/userHooks";
 import { logout } from "@/redux/userSlice";
-import { useDispatch, useSelector } from "react-redux";
-
-const loginUser = (dispatch) => {
-    const token = localStorage.getItem('token');
-    const { data } = useGetUser(token);
-    dispatch(loginUser(data));
-}
-
-const isServerSide = () => typeof window === undefined;
+import { useSelector } from "react-redux";
 
 const getTokenFromLocalStorage = () => {
     try {
@@ -44,10 +36,8 @@ const signOut = (dispatch) => {
 }    
 
 export { 
-    loginUser,
     getTokenFromLocalStorage,
     isUserAuthenticated,
-    isServerSide,
     removeTokenFromLocalstorage,
     signOut,
 };

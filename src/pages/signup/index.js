@@ -1,8 +1,9 @@
-import { useSignUp } from "@/api/userHooks";
-import Authenticated from "@/component/Authenticated";
-import LayoutWithoutHeader from "@/layout/LayoutWithoutHeader";
+import { useSignUp } from "@api/userHooks";
+import Authenticated from "@component/Authenticated";
+import LayoutWithoutHeader from "@layout/LayoutWithoutHeader";
 import { LoadingButton } from "@mui/lab";
 import { Box, Paper, Typography, TextField, Grid } from "@mui/material";
+import Head from "next/head";
 import Link from "next/link";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -17,6 +18,9 @@ const SignUp = () => {
     }
     return (
         <Authenticated>
+            <Head>
+                <title>Sign Up</title>
+            </Head>
             <Box sx={mainContainer}>
                 <Paper elevation={12} sx={paper}>
                 <Box component="div">

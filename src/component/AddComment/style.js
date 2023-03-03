@@ -1,10 +1,12 @@
-export const containerStyle = {
+const containerStyle = {
     display: "flex",
     mt: 1,
     flexDirection: "column"
 };
 
-export const buttonStyle = {
+const buttonStyle = {
     alignSelf: "end",
     mt: 2
 };
+
+export { containerStyle, buttonStyle };

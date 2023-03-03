@@ -6,13 +6,13 @@ const getArticlesURL = (page, search) => `${articlesBaseURL}?page=${page}&keywor
 const deleteArticleByIdURL = (id) => `${articlesBaseURL}/${id}`;
 const getArticleByIdURL = (id) => `${articlesBaseURL}/${id}`;
 const getArticleCommentsURL = (id) => `${articlesBaseURL}/${id}/comments`;
-const filterArticleURL = `${articlesBaseURL}/filter`;
 
 const deleteCommentByIdURL = (id) => `${commentsBaseURL}/${id}`;
 
 const authenticateUserURL = () => `${usersBaseURL}/login`;
+const addToFavouriteURL = `${usersBaseURL}/articles/favourite`;
 
 export { commentsBaseURL, articlesBaseURL, usersBaseURL };
-export { getArticleByIdURL, getArticlesURL, getArticleCommentsURL, deleteArticleByIdURL, filterArticleURL };
+export { getArticleByIdURL, getArticlesURL, getArticleCommentsURL, deleteArticleByIdURL };
 export { deleteCommentByIdURL };
-export { authenticateUserURL };
+export { authenticateUserURL, addToFavouriteURL };

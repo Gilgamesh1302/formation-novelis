@@ -1,21 +1,22 @@
-import { useSaveComment } from "@/api/commentHooks";
-import { useGetUser } from "@/api/userHooks";
-import { changeComment } from "@/redux/commentSlice";
+import { useSaveComment } from "@api/commentHooks";
+import { useGetUser } from "@api/userHooks";
 import { LoadingButton } from "@mui/lab";
-import { Avatar, Box, Button, TextField } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import CustomAvatar from "../CustomAvatar";
+import { Box, TextField } from "@mui/material";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import CustomAvatar from "@component/CustomAvatar";
 import { buttonStyle, containerStyle } from "./style";
 
 const AddComment = ({ article }) => {
-    const content = useSelector(state => state.comment.content);
     const token = useSelector(state => state.token);
     const { isLoading: userLoading, data: user } = useGetUser(token);
-    const dispatch = useDispatch();
     const { mutate, isLoading } = useSaveComment();
+    const [content, setContent] = useState("");
+
     const onChange = event => {
-        dispatch(changeComment(event.target.value));
+        setContent(event.target.value);
     }
+
     const handleButtonClick = () => {
         if (!userLoading) {
             const comment = {
@@ -25,9 +26,12 @@ const AddComment = ({ article }) => {
                     id: user.id
                 }
             };
-            mutate(comment);    
+            mutate(comment, {
+                onSuccess: () => setContent(""),
+            });    
         }
     };
+
     return (
         <Box component="div" sx={containerStyle}>
             <Box variant="div" sx={{ display: "flex" }}>

@@ -3,7 +3,12 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@component/*": ["./src/component/*"]
+      "@component/*": ["./src/component/*"],
+      "@api/*": ["./src/api/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@redux/*": ["./src/redux/*"],
+      "@constant/*": ["./src/constant/*"],
+      "@layout/*": ["./src/layout/*"]
     }
   }
 }

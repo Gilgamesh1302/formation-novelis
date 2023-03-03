@@ -1,22 +1,30 @@
-import React, { useEffect, useState } from "react"
-import { Typography, TextField, Box, Radio, Button } from "@mui/material"
-import { filterAndSortObject } from "@/utils/sortAndFilter"
-import { useForm } from "react-hook-form";
+import React from "react"
+import { Typography, TextField, Box, Radio, Button, Stack, Switch } from "@mui/material"
+import { filterAndSortObject as sort } from "@utils/sortAndFilter"
 import { useDispatch } from "react-redux";
-import { setFilter } from "@/redux/filterSlice";
-import { useQueryClient } from "react-query";
+import { setFilter } from "@redux/filterSlice";
 
-const  Filter = ({ search, handleClick, handleChange, refetch  }) => {
-    const sort = filterAndSortObject;
+const  Filter = ({ 
+    search, 
+    handleClick,
+    handleChange, 
+    form,
+    desc,
+    setDesc 
+}) => {
     const dispatch = useDispatch();
-    const { register, handleSubmit, reset, watch } = useForm();
+    const { register, handleSubmit, reset, watch } = form;
     const watchSortBy = watch("sortBy");
     const watchFilterBy = watch("filterBy");
 
     const resetData = () => {
         const resetToEmpty = formValue => Object.keys(formValue).forEach((key) => formValue[key] = "");
         reset(resetToEmpty);
+        setDesc(false);
+        dispatch(setFilter(null));
     }
+
+    const handleToggleDesc = () => setDesc(prevState => !prevState);
 
     const cleanFilterData = data => {
         if (!data.sortBy && !data.filterBy) {
@@ -34,7 +42,7 @@ const  Filter = ({ search, handleClick, handleChange, refetch  }) => {
 
     const onSubmit = data => {
         data = cleanFilterData(data)
-        dispatch(setFilter(data));
+        dispatch(setFilter({ ...data, desc }));
     }
 
     return (
@@ -53,43 +61,38 @@ const  Filter = ({ search, handleClick, handleChange, refetch  }) => {
                     autoComplete="off"
                     size='small'
                     onKeyDown={handleClick}
+                    fullWidth
                     placeholder='Press "Enter"'
                 />
             </Box>
             <Box variant="div" mb={1}>
-                <Typography variant='subtitle2'>
-                    Sort By
-                </Typography>
-                <Box variant="div">
-                    <Radio 
-                        sx={{ pl: 0, py: 0.5 }}
-                        size="small"
-                        { ...register("sortBy") }
-                        value={sort.sortBy.author.value}
-                        checked={watchSortBy === sort.sortBy.author.value} 
-                    />
-                    <Typography variant="caption">{sort.sortBy.author.label}</Typography>
+                <Box variant="div" sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant='subtitle2'>
+                        Sort By
+                    </Typography>
+                    <Box variant="div">
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <Switch 
+                                size="small"
+                                checked={desc}
+                                onChange={handleToggleDesc}
+                            />
+                            <Typography variant="caption" >Desc</Typography>
+                        </Stack>
+                    </Box>
                 </Box>
-                <Box variant="div">
-                    <Radio 
-                        sx={{ pl: 0, py: 0.5 }}
-                        size="small"
-                        { ...register("sortBy") }
-                        value={sort.sortBy.title.value} 
-                        checked={watchSortBy === sort.sortBy.title.value}
-                    />
-                    <Typography variant="caption">{sort.sortBy.title.label}</Typography>
-                </Box>
-                <Box variant="div">
-                    <Radio 
-                        sx={{ pl: 0, py: 0.5 }}
-                        size="small"
-                        { ...register("sortBy") }
-                        value={sort.sortBy.createdAt.value} 
-                        checked={watchSortBy === sort.sortBy.createdAt.value}
-                    />
-                    <Typography variant="caption">{sort.sortBy.createdAt.label}</Typography>
-                </Box>
+                {Object.values(sort.sortBy).map(value => (
+                    <Box variant="div">
+                        <Radio 
+                            sx={{ pl: 0, py: 0.5 }}
+                            size="small"
+                            { ...register("sortBy") }
+                            value={value.value}
+                            checked={watchSortBy === value.value} 
+                        />
+                        <Typography variant="caption">{value.label}</Typography>
+                    </Box>
+                ))}
             </Box>
             <Box variant="div" mb={1}>
                 <Typography variant='subtitle2'>
@@ -111,6 +114,7 @@ const  Filter = ({ search, handleClick, handleChange, refetch  }) => {
                             <TextField 
                                 { ...register('authorName', { required: true }) }
                                 label="author"
+                                fullWidth
                                 size="small"    
                             />
                         </Box>
@@ -149,16 +153,6 @@ const  Filter = ({ search, handleClick, handleChange, refetch  }) => {
                         </Box>
                     )
                 }
-                <Box variant="div">
-                    <Radio 
-                        sx={{ pl: 0, py: 0.5 }}
-                        size="small"
-                        { ...register("filterBy") }
-                        value={sort.filterBy.articleWithUserComments.value} 
-                        checked={watchFilterBy === sort.filterBy.articleWithUserComments.value}
-                    />
-                    <Typography variant="caption">{sort.filterBy.articleWithUserComments.label}</Typography>
-                </Box>
                 <Box variant="div" display="flex" justifyContent="space-between" mt={2}>
                     <Button 
                         size="small" 

@@ -1,15 +1,15 @@
-import { useGetArticleById } from '@/api/articleHooks';
-import AddComment from '@/component/AddComment';
-import Comment from '@/component/Comment';
-import EmptyListHandler from '@/component/EmptyListHandler';
-import PreFetch from '@/component/PreFetch';
-import { formatDate } from '@/utils/dateUtils';
-import { isUserAuthenticated } from '@/utils/authenticationUtils';
+import { useGetArticleById } from '@api/articleHooks';
+import AddComment from '@component/AddComment';
+import Comment from '@component/Comment';
+import EmptyListHandler from '@component/EmptyListHandler';
+import PreFetch from '@component/PreFetch';
+import { formatDate } from '@utils/dateUtils';
+import { isUserAuthenticated } from '@utils/authenticationUtils';
 import { Box, CardMedia, Paper, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { useSelector } from 'react-redux';
+import Head from 'next/head';
 
 const ArticleDetail = () => {
     const initialState = {
@@ -29,6 +29,9 @@ const ArticleDetail = () => {
             isLoading={isLoading}
             error={error}
         >
+            <Head>
+                <title>{article.title}</title>
+            </Head>
             <Grid
                 container
                 justifyContent="center"

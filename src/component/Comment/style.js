@@ -1,4 +1,4 @@
-const { grey } = require("@mui/material/colors");
+import { grey } from "@mui/material/colors";
 
 const containerStyle = {
     display: "flex",

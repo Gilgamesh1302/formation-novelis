@@ -1,15 +1,25 @@
 import { login } from "@/redux/userSlice";
-import { authenticateUserURL, usersBaseURL } from "@/utils/urls";
+import { addToFavouriteURL, authenticateUserURL, usersBaseURL } from "@/utils/urls";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { useMutation, useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
 
 
-const authenticateUser = async ({ username, password }) => {
-    const { data: token } = await axios.post(authenticateUserURL(), { username, password });
+// Api calls with axios
+const authenticateUser = async (user) => {
+    const { data: token } = await axios.post(authenticateUserURL(), user);
     return token;
 };
+
+const addOrRemoveFavouriteArticle = async (favouriteArticle, token) => {
+    const { data } = await axios.post(addToFavouriteURL, favouriteArticle, {
+        headers: {
+            Authorization: token
+        }
+    });
+    return data;
+}
 
 const getUser = async (token) => {
     const { data } = await axios.get(`${usersBaseURL}/authenticated`, {
@@ -25,9 +35,27 @@ const saveUser = async (user) => {
     return data;
 }
 
+// React Query Custom Hooks
 const useGetUser = (token) => {
-    const { isLoading, data } = useQuery(["user", token], () => getUser(token));
+    const { isLoading, data } = useQuery(
+        ["user", token],
+        () => getUser(token)
+    );
     return { isLoading, data };
+}
+
+const useAddToFavourite = () => {
+    const token = useSelector(state => state.token);
+    const queryClient = useQueryClient();
+    const mutation = useMutation(
+        (data) => addOrRemoveFavouriteArticle(data, token),
+        {
+            onSuccess: () => {
+                queryClient.invalidateQueries(["user", token]);
+            }
+        }
+    );
+    return mutation;
 }
 
 const useAuthenticate = () => {
@@ -59,4 +87,4 @@ const useSignUp = () => {
     return mutation;
 }
 
-export { useAuthenticate, useGetUser, useSignUp };
+export { useAuthenticate, useGetUser, useSignUp, useAddToFavourite };

@@ -1,4 +1,4 @@
-import { signOut } from "@/utils/authenticationUtils";
+import { signOut } from "@utils/authenticationUtils";
 
 export const navBarItems = ["Articles", "Profile"];
 export const appBarSettingsItems = [
